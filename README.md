@@ -1,7 +1,11 @@
 ## Read me
 
-This repository contains python implementation of alignment of reads to reference genome sequence. The process of alignment is complex and demanding and divided into several steps each using a different algorithm. “Seed and Extend” method in combination with Burrows-Wheeler Transformation and FM index (Full-text index in Minute space) is used for indexed string search in a given text and string alignment is used Needleman-Wunsch algorithm.
+In the source folder you can find python implementation of alignment of reads to reference genome sequence. The process of alignment is complex and demanding and divided into several steps each using a different algorithm. “Seed and Extend” method in combination with Burrows-Wheeler Transformation and FM index (Full-text index in Minute space) is used for indexed string search in a given text and string alignment is used Needleman-Wunsch algorithm.
 Seed and Extend is a method that first performs “coarse” search by searching for patterns (seeds) extracted from a string that is searched for in the given text (BWT and FM index) and afterwards does fine alignments in the vicinity of the seeds and chooses the best scoring fine-grain alignment (Needleman-Wunsch).
+
+In the files folder you can find the files which were used for testing. 
+
+In the results folder you can find the log files, diagrams and also the sam file. 
 
 ## Modules
 
