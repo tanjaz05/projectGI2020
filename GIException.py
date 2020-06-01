@@ -1,2 +1,0 @@
-class GIException(Exception):
-   pass
