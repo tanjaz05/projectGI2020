@@ -29,7 +29,7 @@ Run this program by running seed_and_extend.py script and passing all needed par
 
 **Example:**
 
-seed_and_extend.py -f C:\Users\User\Downloads\genomska\sample.fa -q C:\Users\User\Downloads\genomska\sampletest.fq -s 10 -mg 0 -m 1 -i -7 -r -2
+seed_and_extend.py -f ..\files\reference.fasta -q ..\files\reads.fastq -s 10 -mg 0 -m 1 -i -7 -r -2
 
 ## Video presentation
 
