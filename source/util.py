@@ -1,6 +1,6 @@
 from GIException import GIException
-import sys
 import globalVariables
+import argparse
 
 
 def set_fasta_file(value):
@@ -12,78 +12,28 @@ def set_fastq_file(value):
 
 
 def set_seed(value):
-    if (not value.isnumeric() or int(value) <= 0):
+    if value <= 0:
         raise GIException("Invalid parameter - seed length should be number greater than 0")
     globalVariables.seed_length = int(value)
 
 
 def set_margin(value):
-    if (not value.isnumeric() or int(value) < 0 or int(value) > 3):
-        raise GIException("Invalid parameter - margin should be number between 0 and 3 (0 and 3 included)")
     globalVariables.margin = int(value)
 
 
 def set_match(value):
-    val = value
-    sign = 1
-    if (value[0] == "-"):
-        val = value[1:]
-        sign = -1
-    if (not val.isnumeric()):
-        raise GIException("Invalid parameter - match should be number")
-    globalVariables.match = sign * int(val)
+    globalVariables.match = value
 
 
 def set_replacement(value):
-    val = value
-    sign = 1
-    if (value[0] == "-"):
-        val = value[1:]
-        sign = -1
-    if (not val.isnumeric()):
-        raise GIException("Invalid parameter - replacement should be number")
-    globalVariables.replacement = sign * int(val)
+    globalVariables.replacement = value
 
 
 def set_insertion_deletion(value):
-    val = value
-    sign = 1
-    if (value[0] == "-"):
-        val = value[1:]
-        sign = -1
-    if (not val.isnumeric()):
-        raise GIException("Invalid parameter - insertion should be number")
-    globalVariables.insertion = sign * int(val)
-
-
-def invalid_parameter(value):
-    raise GIException("Unknown parameter " + value)
-
-
-def read_command_line_arguments():
-    if (len(sys.argv) < 15):
-        # logger.error("Missing parameters - required: fasta file path, fastq file path, seed length, margin, match. replace, insertion/deletions")
-        raise GIException(
-            "Missing parameters - required: fasta file path, fastq file path, seed length, margin, match. replace, insertion/deletions")
-    switcher = {
-        "-f": set_fasta_file,
-        "-q": set_fastq_file,
-        "-s": set_seed,
-        "-mg": set_margin,
-        "-m": set_match,
-        "-r": set_replacement,
-        "-i": set_insertion_deletion
-    }
-    for i in range(len(sys.argv)):
-        if i % 2 == 1:
-            set_parameter = switcher.get(sys.argv[i], invalid_parameter)
-            arg = sys.argv[i] if set_parameter == invalid_parameter else sys.argv[i + 1];
-            set_parameter(arg)
-    # print_command_line_arguments(logger)
+    globalVariables.insertion = value
 
 
 def print_command_line_arguments(logger):
-    # print("Parameters successfully read:")
     logger.info("Parameters successfully read:")
     logger.info("fasta file: " + globalVariables.fastaFile)
     logger.info("fastq file: " + globalVariables.fastqFile)
@@ -93,3 +43,22 @@ def print_command_line_arguments(logger):
     logger.info("match: " + str(globalVariables.match))
     logger.info("mismatch: " + str(globalVariables.replacement))
     logger.info("insertion/deletion: " + str(globalVariables.insertion))
+
+
+def init_arguments():
+    parser = argparse.ArgumentParser("Performs alignment of reads to reference genome")
+    parser.add_argument("f", help="path to fasta file containing reference genome", type=str)
+    parser.add_argument("q", help="path to fastq file containing collection of reads", type=str)
+    parser.add_argument("s", help="length of seed for seed and extend method", type=int)
+    parser.add_argument("mg", help="how much longer the reference should be than the rest of the read", type=int, choices=[0,1,2,3])
+    parser.add_argument("m", help="match value for scoring matrix", type=int)
+    parser.add_argument("r", help="mismatch value for scoring matrix", type=int)
+    parser.add_argument("i", help="value for insertion/deletion for scoring matrix", type=int)
+    args = parser.parse_args()
+    set_fasta_file(args.f)
+    set_fastq_file(args.q)
+    set_seed(args.s)
+    set_margin(args.mg)
+    set_match(args.m)
+    set_replacement(args.r)
+    set_insertion_deletion(args.i)

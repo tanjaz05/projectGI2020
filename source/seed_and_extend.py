@@ -7,25 +7,26 @@ from NeedlemanWunsch import NeedlemanWunsch
 import util
 import globalVariables
 import logging
+import os
 
 
-def align_read(x, y, occurences, is_reversed):
+def align_read(x, y, occurrences, is_reversed):
     list = []
-    for index in occurences:
+    for index in occurrences:
         start_position = index + globalVariables.seed_length
         read_length = len(y)
         dif_read_length = read_length + globalVariables.margin
         end_position = start_position + dif_read_length
         # print("fasta", x)
         # print("fastq", y)
-        if (len(x) >= end_position):
-            D, globalAlignmentScore = nw.globalAlignment(x[start_position:end_position], y, nw.scoringMatrix)
-            # print(globalAlignmentScore)
-            # print(D)
-            a, transcript = nw.traceback(x[start_position: start_position + dif_read_length], y, D, nw.scoringMatrix)
+        if len(x) >= end_position:
+            d, global_alignment_score = nw.globalAlignment(x[start_position:end_position], y, nw.scoringMatrix)
+            # print(global_alignment_score)
+            # print(d)
+            a, transcript = nw.traceback(x[start_position: start_position + dif_read_length], y, d, nw.scoringMatrix)
             # print(a)
             # print(transcript)
-            aligned_read = AlignedReadDetails(is_reversed, index, globalAlignmentScore, transcript)
+            aligned_read = AlignedReadDetails(is_reversed, index, global_alignment_score, transcript)
         else:
             # print("Match was found too close to the end of referent sequnce, string can not be aligned")
             aligned_read = AlignedReadDetails(is_reversed, index, -sys.maxsize - 1, "")
@@ -35,14 +36,15 @@ def align_read(x, y, occurences, is_reversed):
     return list
 
 
-def find_postion_and_align_read(fm, fasta_sequence, read, is_reversed):
+def find_position_and_align_read(fm, fasta_sequence, read, is_reversed):
     # fm = FmIndex(fasta_sequence)
     pattern = read[:globalVariables.seed_length]
-    alignmetn_list = []
-    if (fm.hasSubstring(pattern)):
-        occurences = fm.occurrences(pattern)
-        alignmetn_list = align_read(fasta_sequence, read_sequnce[globalVariables.seed_length:], occurences, is_reversed)
-    return alignmetn_list
+    alignment_list = []
+    if fm.hasSubstring(pattern):
+        occurrences = fm.occurrences(pattern)
+        alignment_list = align_read(fasta_sequence, read_sequnce[globalVariables.seed_length:], occurrences,
+                                    is_reversed)
+    return alignment_list
 
 
 def process_whole_read(fm, fasta_sequence, read):
@@ -50,18 +52,20 @@ def process_whole_read(fm, fasta_sequence, read):
     # print("reversed read", reverse_read)
     alignments_list = []
     # print("regular")
-    alignments_list = alignments_list + find_postion_and_align_read(fm, fasta_sequence, read, False)
+    alignments_list = alignments_list + find_position_and_align_read(fm, fasta_sequence, read, False)
     # print("reverse")
-    alignments_list = alignments_list + find_postion_and_align_read(fm, fasta_sequence, reverse_read, True)
+    alignments_list = alignments_list + find_position_and_align_read(fm, fasta_sequence, reverse_read, True)
     alignments_list.sort(key=lambda read: read.alignment_score, reverse=True)
     # print([(read.alignment_score, read.position, read.edit_transcript) for read in alignments_list])
     return alignments_list
 
 
-util.read_command_line_arguments()
-# file_name = "/logs/test_logger_" + str(globalVariables.match) + "_" + str(globalVariables.replacement) + "_" + str(
-#     globalVariables.insertion) + ".log"
-file_name = "/logs/log_" + str(globalVariables.seed_length) + "_" + str(globalVariables.margin) + ".log"
+util.init_arguments()
+current_working_directory = os.getcwd()
+full_path = current_working_directory + "/logs"
+if not os.path.exists(full_path):
+    os.makedirs(full_path)
+file_name = full_path + "/log_" + str(globalVariables.seed_length) + "_" + str(globalVariables.margin) + ".log"
 logging.basicConfig(level=logging.DEBUG,
                     format='%(message)s',
                     datefmt='%m-%d %H:%M',
@@ -79,7 +83,7 @@ except Exception as ex:
 fasta_record = fasta_records[list(fasta_records.keys())[0]]
 result = dict()
 
-if (len(fastq_records) == 0):
+if len(fastq_records) == 0:
     logger.info("There are no reads in stated fastq file: " + globalVariables.fastqFile)
     print("There are no reads in stated fastq file: " + globalVariables.fastqFile)
 else:
@@ -101,10 +105,12 @@ else:
         # logger.info(key)
         # print(key)
         result_sort = sorted(result[key], key=lambda curr: curr.alignment_score, reverse=True)
-        if (len(result_sort) > 0):
-            number_of_mapped_reads = number_of_mapped_reads+ 1
+        if len(result_sort) > 0:
+            number_of_mapped_reads = number_of_mapped_reads + 1
         for read in result_sort:
-            logger.info(key +"," + str(read.position) +"," + str(read.alignment_score) + "," + read.edit_transcript + "," + str(read.is_revesed))
+            logger.info(key + "," + str(read.position) + "," + str(
+                read.alignment_score) + "," + read.edit_transcript + "," + str(read.is_revesed))
             # print(read.position, read.alignment_score, read.edit_transcript, read.is_revesed)
         # print(key, sizeof(result[key]))
     logger.info("Number of mapped reads " + str(number_of_mapped_reads))
+print("done")
