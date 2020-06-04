@@ -100,7 +100,7 @@ else:
         # print("for loop", [(read.alignment_score, read.position, read.edit_transcript) for read in total_alignments])
         result[read] = total_alignments
     number_of_mapped_reads = 0
-    logger.info("key,position,alignmentScore,reversed")
+    logger.info("key,position,alignmentScore,editTranscript,reversed")
     for key in result.keys():
         # logger.info(key)
         # print(key)
