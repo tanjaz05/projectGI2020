@@ -23,13 +23,13 @@ globalVariables.py - where all global variables are declared
 ## How to run
 
 Run this program by running seed_and_extend.py script and passing all needed parameters:
-	- path to fasta file containing reference genome
-	- path to fastq file containing collection of reads
-	- length of seed - a number greater than 0 that will be used in Seed and Extend algorithm and it represents the number of characters from the start of the read (pattern) that will be used in bwt algorithm for string searching
-	- margin - a number between 0 and 3 (0 and 3 included) that represents how many more characters the reference genome will have compared to the rest of the read for string alignment
-	- match - value for scoring matrix in case of a match
-	- replacement - value for scoring matrix in case of a mismatch 
-	- insertion - value for scoring matrix in case of an insertion or deletion
+- path to fasta file containing reference genome
+- path to fastq file containing collection of reads
+- length of seed - a number greater than 0 that will be used in Seed and Extend algorithm and it represents the number of characters from the start of the read (pattern) that will be used in bwt algorithm for string searching
+- margin - a number between 0 and 3 (0 and 3 included) that represents how many more characters the reference genome will have compared to the rest of the read for string alignment
+- match - value for scoring matrix in case of a match
+- replacement - value for scoring matrix in case of a mismatch 
+- insertion - value for scoring matrix in case of an insertion or deletion
 
 **Example:**
 
